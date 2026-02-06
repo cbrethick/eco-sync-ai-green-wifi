@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Sync: Smart Green Wi-Fi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #6b7280;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0fff4 0%, #f0f9ff 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .rethink-cb {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Impact Cards */
+        .impact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .impact-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .impact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .energy-icon {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+        }
+
+        .co2-icon {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--secondary);
+        }
+
+        .card-content h3 {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .card-unit {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-left: 5px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1300px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h2 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-icon {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .chart-hint {
+            font-size: 0.9rem;
+            color: var(--gray);
+            background-color: var(--primary-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .status-active {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+        }
+
+        .status-idle {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 30px;
+        }
+
+        /* Animation for values */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .updated {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with RETHINK CB at the top -->
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Eco-Sync: Smart Green Wi-Fi</h1>
+                    <p>AI predicts Wi-Fi usage and reduces power during idle periods to save energy and CO₂</p>
+                </div>
+            </div>
+            <div class="rethink-cb">
+                <i class="fas fa-bolt"></i>
+                RETHINK CB
+            </div>
+        </header>
+        <div class="chart-hint">
+  Baseline assumes a normal Wi-Fi router running at full power all the time.
+  Eco-Sync dynamically reduces power using AI predictions during idle periods.
+</div>
+
+
+        <!-- Impact Cards -->
+        <div class="impact-container">
+            <div class="impact-card">
+                <div class="card-icon energy-icon">
+                    <i class="fas fa-battery-full"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Total Energy Saved</h3>
+                    <div class="card-value" id="energySaved">0 <span class="card-unit">Wh</span></div>
+                </div>
+            </div>
+            
+            <div class="impact-card">
+                <div class="card-icon co2-icon">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Total CO₂ Reduced</h3>
+                    <div class="card-value" id="co2Saved">0 <span class="card-unit">kg</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-label">Current Power</div>
+                <div class="status-value" id="currentPower">100%</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Current Traffic</div>
+                <div class="status-value" id="currentTraffic">0 MB/s</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Predicted Traffic</div>
+                <div class="status-value" id="predictedTraffic">0 MB/s</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Router Status</div>
+                <div class="status-badge status-active" id="routerStatus">Active</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid with Charts -->
+        <div class="dashboard-grid">
+            <!-- Network Activity Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2><i class="fas fa-network-wired chart-icon"></i> Network Activity</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Router Power Control Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2><i class="fas fa-sliders-h chart-icon"></i> Router Power Control</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Energy Usage Comparison Chart -->
+            <div class="chart-container" style="grid-column: span 2;">
+                <div class="chart-header">
+                    <h2><i class="fas fa-chart-line chart-icon"></i> Energy Usage Comparison</h2>
+                </div>
+                <div class="chart-hint">
+                    <strong>Baseline</strong> = normal router (always ON) | 
+                    <strong>Eco-Sync</strong> = AI-controlled power saving
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="energyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Eco-Sync Dashboard • Real-time monitoring and AI-powered energy optimization</p>
+            <p>Data updates every 5 seconds • Last updated: <span id="lastUpdateTime">--:--:--</span></p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize Charts
+        let labels = [];
+        let trafficData = [];
+        let predictedData = [];
+        let powerData = [];
+        let baselineEnergyData = [];
+        let ecoEnergyData = [];
+
+        // Chart colors
+        const colors = {
+            traffic: 'rgba(59, 130, 246, 0.8)',
+            predicted: 'rgba(245, 158, 11, 0.8)',
+            power: 'rgba(16, 185, 129, 0.8)',
+            baseline: 'rgba(239, 68, 68, 0.8)',
+            eco: 'rgba(16, 185, 129, 0.8)'
+        };
+
+        // Traffic Chart
+        const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+        const trafficChart = new Chart(trafficCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Real Traffic',
+                        data: trafficData,
+                        borderColor: colors.traffic,
+                        backgroundColor: colors.traffic.replace('0.8', '0.1'),
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Predicted Traffic',
+                        data: predictedData,
+                        borderColor: colors.predicted,
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'MB/s'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+
+        // Power Chart
+        const powerCtx = document.getElementById('powerChart').getContext('2d');
+        const powerChart = new Chart(powerCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Power Level',
+                    data: powerData,
+                    borderColor: colors.power,
+                    backgroundColor: colors.power.replace('0.8', '0.1'),
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Power (%)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+
+        // Energy Chart
+        const energyCtx = document.getElementById('energyChart').getContext('2d');
+        const energyChart = new Chart(energyCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Baseline Energy',
+                        data: baselineEnergyData,
+                        borderColor: colors.baseline,
+                        backgroundColor: colors.baseline.replace('0.8', '0.1'),
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Eco-Sync Energy',
+                        data: ecoEnergyData,
+                        borderColor: colors.eco,
+                        backgroundColor: colors.eco.replace('0.8', '0.1'),
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Energy (Wh)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+        // Update dashboard with data
+        async function updateDashboard() {
+            try {
+                // In a real app, you would fetch from your Flask API
+                // const res = await fetch("/data");
+                // const data = await res.json();
+                
+                // For demo, generate simulated data
+                const res = await fetch("/data");
+                const data = await res.json();
+                
+                // Update totals
+                totalEnergySaved = data.total_energy_saved;
+                totalCo2Saved = data.total_co2_saved;
+                
+                // Update impact cards with animation
+                const energyElement = document.getElementById('energySaved');
+                const co2Element = document.getElementById('co2Saved');
+                
+                energyElement.innerHTML = `${data.total_energy_saved.toFixed(1)} <span class="card-unit">Wh</span>`;
+                co2Element.innerHTML = `${data.total_co2_saved.toFixed(3)} <span class="card-unit">kg</span>`;
+                
+                // Add pulse animation to updated values
+                energyElement.classList.add('updated');
+                co2Element.classList.add('updated');
+                setTimeout(() => {
+                    energyElement.classList.remove('updated');
+                    co2Element.classList.remove('updated');
+                }, 500);
+                
+                // Update status bar
+                document.getElementById('currentPower').textContent = `${data.power}%`;
+                document.getElementById('currentTraffic').textContent = `${data.traffic.toFixed(1)} MB/s`;
+                document.getElementById('predictedTraffic').textContent = `${data.predicted.toFixed(1)} MB/s`;
+                
+                // Update router status based on power
+                const routerStatus = document.getElementById('routerStatus');
+                if (data.power < 40) {
+                    routerStatus.textContent = "Power Saving";
+                    routerStatus.className = "status-badge status-idle";
+                } else if (data.power < 70) {
+                    routerStatus.textContent = "Moderate";
+                    routerStatus.className = "status-badge status-active";
+                    routerStatus.style.backgroundColor = "rgba(245, 158, 11, 0.1)";
+                    routerStatus.style.color = "#f59e0b";
+                } else {
+                    routerStatus.textContent = "Active";
+                    routerStatus.className = "status-badge status-active";
+                }
+                
+                // Update charts
+                labels.push(data.time);
+                trafficData.push(data.traffic);
+                predictedData.push(data.predicted);
+                powerData.push(data.power);
+                baselineEnergyData.push(data.baseline_energy);
+                ecoEnergyData.push(data.eco_energy);
+                
+                // Keep only last 15 data points for clean charts
+                if (labels.length > 15) {
+                    labels.shift();
+                    trafficData.shift();
+                    predictedData.shift();
+                    powerData.shift();
+                    baselineEnergyData.shift();
+                    ecoEnergyData.shift();
+                }
+                
+                // Update charts
+                trafficChart.update();
+                powerChart.update();
+                energyChart.update();
+                
+                // Update last update time
+                document.getElementById('lastUpdateTime').textContent = data.time;
+                
+            } catch (error) {
+                console.error("Error updating dashboard:", error);
+            }
+        }
+        // Update charts with initial data
+        trafficChart.update();
+        powerChart.update();
+        energyChart.update();
+        
+        // Update dashboard every 5 seconds
+        setInterval(updateDashboard, 5000);
+        
+        // Initial update
+        updateDashboard();
+    </script>
+</body>
+</html>
