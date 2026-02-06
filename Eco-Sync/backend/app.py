@@ -3,7 +3,7 @@ from src.realtime_collector import collect
 from src.ai_predictor import Predictor
 from src.adaptive_power import decide
 from src.energy_model import energy, co2
-
+import os
 app = Flask(__name__)
 
 predictor = Predictor()
@@ -47,4 +47,5 @@ def data():
     })
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
