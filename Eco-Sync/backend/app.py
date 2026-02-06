@@ -13,7 +13,7 @@ baseline_energy = 10  # 10W always ON
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("templates/index.html")
 
 @app.route("/data")
 def data():
