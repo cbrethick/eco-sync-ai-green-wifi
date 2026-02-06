@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, jsonify
 from src.realtime_collector import collect
 from src.ai_predictor import Predictor
 from src.adaptive_power import decide
@@ -9,11 +9,13 @@ app = Flask(__name__)
 predictor = Predictor()
 total_energy_saved = 0.0
 total_co2_saved = 0.0
-baseline_energy = 10  # 10W always ON
 
 @app.route("/")
-def index():
-    return render_template("templates/index.html")
+def health():
+    return jsonify({
+        "status": "Eco-Sync backend is running",
+        "endpoint": "/data"
+    })
 
 @app.route("/data")
 def data():
@@ -25,8 +27,8 @@ def data():
 
     power = decide(prediction)
 
-    baseline_energy = 10          # Wh per interval (baseline)
-    eco_energy = energy(power)    # Wh per interval (Eco-Sync)
+    baseline_energy = 10
+    eco_energy = energy(power)
 
     energy_saved = max(baseline_energy - eco_energy, 0)
     co2_saved = co2(energy_saved)
@@ -35,21 +37,14 @@ def data():
     total_co2_saved += co2_saved
 
     return jsonify({
-        "time": stats["time"],
-        "traffic": stats["traffic_mb_s"],
+        "traffic": round(stats["traffic_mb_s"], 4),
         "predicted": round(prediction, 4) if prediction else None,
         "power": power,
-        "baseline_energy": round(baseline_energy, 2),
+        "baseline_energy": baseline_energy,
         "eco_energy": round(eco_energy, 2),
-        "energy_saved": round(energy_saved, 2),
         "total_energy_saved": round(total_energy_saved, 2),
         "total_co2_saved": round(total_co2_saved, 6)
     })
 
-
-
-
 if __name__ == "__main__":
     app.run()
-
-
