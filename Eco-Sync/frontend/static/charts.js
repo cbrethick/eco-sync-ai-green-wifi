@@ -46,7 +46,7 @@ const energyChart = new Chart(
 );
 
 async function updateDashboard() {
-    const res = await fetch("/data");
+    const res = await fetch("https://eco-sync-backend.onrender.com/data");
     const data = await res.json();
     document.getElementById("energySaved").innerText =
     data.total_energy_saved + " Wh";
