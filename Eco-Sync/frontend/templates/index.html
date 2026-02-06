@@ -579,9 +579,9 @@
                 // const data = await res.json();
                 
                 // For demo, generate simulated data
-                const res = await fetch("https://eco-sync-ai-green-wifi.onrender.com/data");
+                const res = await fetch("https://eco-sync-backend.onrender.com/data");
                 const data = await res.json();
-                
+                const now = new Date().toLocaleTimeString();
                 // Update totals
                 totalEnergySaved = data.total_energy_saved;
                 totalCo2Saved = data.total_co2_saved;
@@ -604,7 +604,11 @@
                 // Update status bar
                 document.getElementById('currentPower').textContent = `${data.power}%`;
                 document.getElementById('currentTraffic').textContent = `${data.traffic.toFixed(1)} MB/s`;
-                document.getElementById('predictedTraffic').textContent = `${data.predicted.toFixed(1)} MB/s`;
+                document.getElementById('predictedTraffic').textContent =
+                data.predicted !== null
+                    ? `${data.predicted.toFixed(1)} MB/s`
+                    :  "Learning...";
+
                 
                 // Update router status based on power
                 const routerStatus = document.getElementById('routerStatus');
@@ -622,7 +626,7 @@
                 }
                 
                 // Update charts
-                labels.push(data.time);
+                labels.push(now);
                 trafficData.push(data.traffic);
                 predictedData.push(data.predicted);
                 powerData.push(data.power);
@@ -645,7 +649,7 @@
                 energyChart.update();
                 
                 // Update last update time
-                document.getElementById('lastUpdateTime').textContent = data.time;
+                document.getElementById('lastUpdateTime').textContent = now;
                 
             } catch (error) {
                 console.error("Error updating dashboard:", error);
